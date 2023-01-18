@@ -1,23 +1,32 @@
+import {initConfig, Config} from './src/Configuration';
+import {reloadCommands} from './src/Commands';
+import { commandsMap } from './src/Globals';
 import Discord from 'discord.js';
-import fs from 'fs';
-import Path from 'path';
+initConfig();
+reloadCommands();
 
 var client:Discord.Client = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES']});
 
 client.on('ready', () => 
 {
-    console.log("Me gustan las pollas");
-    client.user?.setPresence({status: "dnd"});
+    console.log("Estamos ready pa");
+    client.user?.setPresence({activities: [{name: Config.presence}]});
 });
 
-client.on('messageCreate', (msg) =>
+client.on('messageCreate', (message) =>
 {
-    if (msg.author.bot) return;
+    let args = message.content.substring(Config.defaultPrefix.length).split(" ");
 
-    if (msg.content === "que")
-        msg.reply("so");
+    if (message.author.bot) return;
+
+    if (commandsMap.has(message.content))
+        message.reply(commandsMap.get(message.content)!);
+
+    if (args[0] === "reload")
+    {
+        reloadCommands();
+        message.reply("Comandos actualizados");
+    }
 });
 
-fs.readFile(Path.join(__dirname, "token"), {encoding: 'utf-8'}, (err, data) => {
-    client.login(data);
-});
+client.login(Config.token);
