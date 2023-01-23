@@ -1,20 +1,25 @@
 import fs from 'fs';
 import path from 'path';
-import { basePath, commandsMap } from './Globals';
+import Discord from 'discord.js';
+import { Globals } from './Globals';
 
-type Command =
+export type Command =
 {
-    onMessage:string, //onMessage:() => void
-    reply:string
+    onMessage:(message:Discord.Message) => void,
+    onReload:(path:String) => void
 }
 
 export function reloadCommands()
 {
-    var commands = fs.readdirSync(path.join(basePath, "commands"), {encoding: 'utf-8'});
+    var commands = fs.readdirSync(path.join(Globals.basePath, "commands"), {encoding: 'utf-8'});
     for (var i in commands)
     {
-        var fileDetails:Command = JSON.parse(fs.readFileSync(path.join(basePath, "commands", commands[i]), {encoding: 'utf-8'}));
-        if (!commandsMap.has(fileDetails.onMessage))
-            commandsMap.set(fileDetails.onMessage, fileDetails.reply);
+        if (commands[i].endsWith(".ts"))
+        {
+            var commandShit:Command = require(path.join(Globals.basePath, "commands", commands[i]));
+            commandShit.onReload(Globals.basePath);
+            if (!Globals.loadedCommands.includes(commandShit))
+                Globals.loadedCommands.push(commandShit);
+        }
     }
 }

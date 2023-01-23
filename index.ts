@@ -1,7 +1,8 @@
 import {initConfig, Config} from './src/Configuration';
-import {reloadCommands} from './src/Commands';
-import { commandsMap } from './src/Globals';
+import { reloadCommands } from './src/Commands';
+import { Globals } from './src/Globals';
 import Discord from 'discord.js';
+
 initConfig();
 reloadCommands();
 
@@ -10,7 +11,7 @@ var client:Discord.Client = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSA
 client.on('ready', () => 
 {
     console.log("Estamos ready pa");
-    client.user?.setPresence({activities: [{name: Config.presence}]});
+    client.user?.setPresence({status: 'online', activities: [{name: Config.presence}]});
 });
 
 client.on('messageCreate', (message) =>
@@ -19,13 +20,32 @@ client.on('messageCreate', (message) =>
 
     if (message.author.bot) return;
 
-    if (commandsMap.has(message.content))
-        message.reply(commandsMap.get(message.content)!);
+    Globals.loadedCommands.forEach((command) =>
+    {
+        command.onMessage(message);
+    });
 
     if (args[0] === "reload")
     {
         reloadCommands();
         message.reply("Comandos actualizados");
+    }
+
+    if (args[0] === "shutdown")
+    {
+        if (Config.adminIDS.includes(parseInt(message.author.id)))
+        {
+            message.reply("kys").then(() => 
+            {
+                client.user?.setPresence({status: 'invisible'});
+                client.destroy();
+                process.exit();
+            });
+        }
+        else
+        {
+            message.reply("No tienes permiso para apagar el bot");
+        }
     }
 });
 

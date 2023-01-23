@@ -1,0 +1,12 @@
+
+this was just some brainstorming on how the syntax for the file would be, pretty fine with one liners, they look sick
+
+{
+    new Funky();
+    funky.messages("que", "qué")
+    funky.answers("so")
+}
+
+Funky() {answers: ("so"), messages: ("que", "qué")}; - the one
+
+[ Funky() { answers: ["so"], messages: ["que", "qué"] }];
