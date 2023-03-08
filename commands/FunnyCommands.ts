@@ -6,10 +6,10 @@ import {Globals} from '../src/Globals';
 module.exports = 
 {
     messageStorage: [new Globals.Funky()],
-    onReload: function(path:string)
+    onReload: async function(path:string)
     {
         this.messageStorage = [];
-        var funky:Array<Globals.Funky> = parseFile([path, "data", "phrases.sanco"]);
+        var funky:Array<Globals.Funky> = await parseFile([path, "data", "phrases.sanco"]) as Globals.Funky[];
         funky.forEach((funkay:Globals.Funky) =>
         {
             if (!this.messageStorage.includes(funkay))

@@ -27,8 +27,11 @@ client.on('messageCreate', (message) =>
 
     if (args[0] === "reload")
     {
-        reloadCommands();
-        message.reply("Comandos actualizados");
+        message.channel.sendTyping();
+        reloadCommands().then(() =>
+        {
+            message.channel.send("Comandos actualizados");
+        });
     }
 
     if (args[0] === "shutdown")
